@@ -1,53 +1,71 @@
-import java.awt.Color;
+import java.util.ArrayList;
 
 /**
- * Class BallDemo - a short demonstration showing animation with the 
- * Canvas class. 
+ * Class BallDemo - a short demonstration showing animation with the Canvas
+ * class.
  *
- * @author Michael Kölling and David J. Barnes
- * @version 2011.07.31
+ * @author Jennifer Moran
+ * @version 2015.11.02
  */
+public class BallDemo {
 
-public class BallDemo   
-{
-    private Canvas myCanvas;
+	private static final int OFFSET = 10;
+	private final Canvas canvas;
 
-    /**
-     * Create a BallDemo object. Creates a fresh canvas and makes it visible.
-     */
-    public BallDemo()
-    {
-        myCanvas = new Canvas("Ball Demo", 600, 500);
-    }
+	/**
+	 * Create a BallDemo object. Creates a fresh canvas and makes it visible.
+	 */
+	public BallDemo() {
+		canvas = new Canvas("Ball Demo", 600, 500);
+	}
 
-    /**
-     * Simulate two bouncing balls
-     */
-    public void bounce()
-    {
-        int ground = 400;   // position of the ground line
+	private void drawCanvas(Canvas canvas) {
 
-        myCanvas.setVisible(true);
+		// get the height and width of the canvas
+		Double height = canvas.getSize().getHeight();
+		Double width = canvas.getSize().getWidth();
+		canvas.setVisible(true);
+		// draw the rectangle using four lines and using the size of the canvas and the offset to figure out where to draw the lines
+		canvas.drawLine(OFFSET, height.intValue() - OFFSET, width.intValue() - OFFSET, height.intValue() - OFFSET);
+		canvas.drawLine(OFFSET, OFFSET, width.intValue() - OFFSET, OFFSET);
+		canvas.drawLine(OFFSET, OFFSET, OFFSET, height.intValue() - OFFSET);
+		canvas.drawLine(width.intValue() - OFFSET, OFFSET, width.intValue() - OFFSET, height.intValue() - OFFSET);
+	}
 
-        // draw the ground
-        myCanvas.drawLine(50, ground, 550, ground);
+	/**
+	 * Draw a rectangle on the canvas and bounce balls inside of it
+	 *
+	 * @param numberOfBalls parameter used to determine number of balls
+	 * @param numberOfBounces parameter used to determine number of bounces
+	 *
+	 */
+	public void boxBounce(int numberOfBalls, int numberOfBounces) {
+		// Verify number of balls is between 5 and 50 per requirements
+		if (numberOfBalls < 5 || numberOfBalls > 50) {
+			System.out.println("Number of Balls must be between 5 and 50");
+			return;
+		}
+		int x = 0;
+		ArrayList<BoxBall> balls = new ArrayList<>();
+		drawCanvas(canvas);
 
-        // crate and show the balls
-        BouncingBall ball = new BouncingBall(50, 50, 16, Color.BLUE, ground, myCanvas);
-        ball.draw();
-        BouncingBall ball2 = new BouncingBall(70, 80, 20, Color.RED, ground, myCanvas);
-        ball2.draw();
+		// Add balls to an ArrayList based on numberOfBalls parameter
+		for (int i = 0; i <= numberOfBalls; i++) {
+			balls.add(new BoxBall(canvas, OFFSET));
+		}
 
-        // make them bounce
-        boolean finished =  false;
-        while(!finished) {
-            myCanvas.wait(50);           // small delay
-            ball.move();
-            ball2.move();
-            // stop once ball has travelled a certain distance on x axis
-            if(ball.getXPosition() >= 550 || ball2.getXPosition() >= 550) {
-                finished = true;
-            }
-        }
-    }
+		// Draw balls in ArrayList
+		for (BoxBall ball : balls) {
+			ball.draw();
+		}
+
+		// make them bounce
+		while (x <= numberOfBounces) {
+			canvas.wait(50); // small delay
+			for (BoxBall ball : balls) {
+				ball.move();
+			}
+			x++;
+		}
+	}
 }
